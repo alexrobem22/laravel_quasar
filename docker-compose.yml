@@ -1,0 +1,41 @@
+version: "3.7"
+
+networks:
+    laravel:
+        driver: bridge
+
+services:
+#banco mysql
+  mysqlGoogle:
+    image: mysql:5.7
+    container_name: mysqlGoogle
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bancoLogin #aqui ele cria o banco por padrao no meu mysql, posso passar ou nao -> nao e obrigatorio
+      MYSQL_USER: alex
+      MYSQL_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysqlGoogledata:/var/lib/mysql
+    networks:
+      - laravel
+    restart: always
+  api:
+    container_name: api
+    build:
+      context: ./login
+    volumes:
+      - ./login:/var/www/html
+    links:
+      - mysqlGoogle
+    ports:
+      - "8000:80"
+    networks:
+      - laravel
+    depends_on:
+      - mysqlGoogle
+    env_file:
+      - ./login/.env
+volumes:
+  mysqlGoogledata:
